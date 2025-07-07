@@ -411,4 +411,311 @@
                 icon: "🔒"
             },
             {
-                title: "Teletrabajo y Aspectos L
+                title: "Teletrabajo y Aspectos Legales",
+                content: "El teletrabajo tiene regulaciones específicas en muchos países, incluyendo el derecho a la desconexión digital, la provisión de equipos y la gestión de gastos, y la prevención de riesgos laborales en el entorno remoto.",
+                icon: "💻"
+            },
+            {
+                title: "Protección de Datos Personales",
+                content: "Los profesionales de TI a menudo manejan datos sensibles. Es fundamental cumplir con normativas como GDPR o leyes locales de protección de datos, incluyendo cláusulas de tratamiento de datos en los contratos y responsabilidades claras.",
+                icon: "🛡️"
+            }
+        ];
+
+        const questionsLaborAspects = [
+            {
+                question: "¿Cuál es la principal característica que distingue una relación laboral de un contrato de prestación de servicios (freelance)?",
+                options: ["El tipo de software desarrollado", "La subordinación y dependencia", "El monto de los honorarios", "La duración del proyecto"],
+                answer: "La subordinación y dependencia",
+                explanation: "La relación laboral se define por la existencia de subordinación y dependencia del trabajador hacia el empleador."
+            },
+            {
+                question: "Si un desarrollador crea un software innovador para su empresa durante su jornada laboral, ¿quién suele ser el titular de los derechos de autor de ese software?",
+                options: ["El desarrollador", "La empresa", "Ambos a partes iguales", "Un tercero designado"],
+                answer: "La empresa",
+                explanation: "En la mayoría de las legislaciones, las obras creadas por un empleado en el cumplimiento de sus funciones laborales pertenecen al empleador."
+            },
+            {
+                question: "Una cláusula de 'no competencia' en un contrato laboral de TI busca principalmente:",
+                options: ["Impedir al empleado trabajar en cualquier otra empresa", "Restringir al empleado de trabajar para competidores por un tiempo limitado", "Asegurar que el empleado no revele secretos comerciales", "Obligar al empleado a seguir formándose"],
+                answer: "Restringir al empleado de trabajar para competidores por un tiempo limitado",
+                explanation: "La cláusula de no competencia post-contractual busca proteger los intereses de la empresa limitando la capacidad del ex-empleado de trabajar para un competidor directo."
+            },
+            {
+                question: "¿Qué derecho legal es fundamental para los empleados que realizan teletrabajo, especialmente en relación con las comunicaciones fuera del horario laboral?",
+                options: ["Derecho a un salario más alto", "Derecho a la desconexión digital", "Derecho a elegir su propio horario", "Derecho a no asistir a reuniones"],
+                answer: "Derecho a la desconexión digital",
+                explanation: "El derecho a la desconexión digital protege el tiempo personal y familiar del teletrabajador, evitando la obligación de responder comunicaciones fuera de su jornada."
+            },
+            {
+                question: "En el contexto de un contrato laboral informático, ¿qué significa que un contrato sea 'por obra o servicio determinado'?",
+                options: ["Que el contrato no tiene una fecha de fin", "Que el contrato es para un proyecto específico y termina al finalizarlo", "Que el empleado solo trabaja por horas", "Que el empleado es autónomo"],
+                answer: "Que el contrato es para un proyecto específico y termina al finalizarlo",
+                explanation: "Este tipo de contrato está vinculado a la realización de una obra o servicio con autonomía y sustantividad propia dentro de la actividad de la empresa."
+            }
+        ];
+
+        // --- Elementos del DOM ---
+        const gameContainer = document.getElementById('game-container'); // Get the container for positioning feedback icons
+        const introScreen = document.getElementById('intro-screen');
+        const topicSelectionScreen = document.getElementById('topic-selection-screen');
+        const theoryScreen = document.getElementById('theory-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        const startButton = document.getElementById('start-button');
+        const contractsTopicButton = document.getElementById('contracts-topic-button');
+        const laborTopicButton = document.getElementById('labor-topic-button');
+        const restartCurrentModuleButton = document.getElementById('restart-current-module-button');
+        const backToTopicsButton = document.getElementById('back-to-topics-button');
+
+        const theoryProgressBar = document.getElementById('theory-progress-bar');
+        const theoryContent = document.getElementById('theory-content');
+        const prevTheoryButton = document.getElementById('prev-theory-button');
+        const nextTheoryButton = document.getElementById('next-theory-button');
+
+        const quizProgressBar = document.getElementById('quiz-progress-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const questionNumberDisplay = document.getElementById('question-number-display');
+        const totalQuestionsDisplay = document.getElementById('total-questions-display');
+        const questionDisplay = document.getElementById('question-display');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const finalScoreDisplay = document.getElementById('final-score-display');
+        const resultsMessage = document.getElementById('results-message');
+        const correctFeedbackIcon = document.getElementById('correct-feedback');
+        const incorrectFeedbackIcon = document.getElementById('incorrect-feedback');
+
+        // --- Variables de Estado del Juego ---
+        let currentModule = ''; // 'contracts' or 'labor'
+        let currentQuestions = [];
+        let currentTheorySlides = [];
+        let currentQuestionIndex = 0;
+        let currentTheorySlideIndex = 0;
+        let score = 0;
+
+        // --- Funciones de Navegación de Pantallas ---
+        function showScreen(screenToShow) {
+            const allScreens = [introScreen, topicSelectionScreen, theoryScreen, gameScreen, resultsScreen];
+            allScreens.forEach(screen => {
+                if (screen === screenToShow) {
+                    screen.classList.remove('hidden');
+                    // Trigger reflow to restart transition
+                    void screen.offsetWidth; // This forces a reflow
+                    screen.classList.add('active');
+                } else {
+                    screen.classList.remove('active');
+                    // Add hidden after transition for elements not visible
+                    setTimeout(() => {
+                        if (!screen.classList.contains('active')) {
+                            screen.classList.add('hidden');
+                        }
+                    }, 500); // Match transition duration
+                }
+            });
+        }
+
+        // --- Lógica del Juego ---
+
+        function goToTopicSelection() {
+            showScreen(topicSelectionScreen);
+        }
+
+        function startModule(moduleName) {
+            currentModule = moduleName;
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreDisplay.textContent = score;
+
+            if (currentModule === 'contracts') {
+                currentQuestions = questionsContracts;
+                showScreen(gameScreen);
+                loadQuestion();
+            } else if (currentModule === 'labor') {
+                currentTheorySlides = theoryLaborAspects;
+                currentQuestions = questionsLaborAspects;
+                currentTheorySlideIndex = 0;
+                showScreen(theoryScreen);
+                loadTheorySlide();
+            }
+        }
+
+        // --- Lógica de Teoría ---
+        function loadTheorySlide() {
+            theoryContent.innerHTML = ''; // Clear previous slides
+            const slide = currentTheorySlides[currentTheorySlideIndex];
+            const slideDiv = document.createElement('div');
+            slideDiv.classList.add('theory-slide', 'w-full', 'mx-auto', 'p-6', 'rounded-xl', 'shadow-md', 'mb-4');
+            slideDiv.innerHTML = `
+                <h3 class="text-2xl font-bold text-indigo-700 mb-4 flex items-center justify-center gap-2">
+                    <span class="text-4xl">${slide.icon || '📚'}</span> ${slide.title}
+                </h3>
+                <p class="text-gray-800 text-lg leading-relaxed">${slide.content}</p>
+            `;
+            theoryContent.appendChild(slideDiv);
+
+            // Animate in the new slide
+            setTimeout(() => {
+                slideDiv.classList.add('active-slide');
+            }, 50); // Small delay to ensure transition applies
+
+            updateTheoryProgressBar();
+            updateTheoryNavigationButtons();
+        }
+
+        function updateTheoryProgressBar() {
+            const progress = ((currentTheorySlideIndex + 1) / currentTheorySlides.length) * 100;
+            theoryProgressBar.style.width = `${progress}%`;
+        }
+
+        function updateTheoryNavigationButtons() {
+            prevTheoryButton.disabled = currentTheorySlideIndex === 0;
+            prevTheoryButton.classList.toggle('opacity-50', currentTheorySlideIndex === 0);
+            prevTheoryButton.classList.toggle('cursor-not-allowed', currentTheorySlideIndex === 0);
+
+            nextTheoryButton.textContent = currentTheorySlideIndex === currentTheorySlides.length - 1 ? '¡Empezar Quiz!' : 'Siguiente';
+        }
+
+        function nextTheorySlide() {
+            if (currentTheorySlideIndex < currentTheorySlides.length - 1) {
+                currentTheorySlideIndex++;
+                loadTheorySlide();
+            } else {
+                // End of theory, start quiz
+                showScreen(gameScreen);
+                loadQuestion();
+            }
+        }
+
+        function prevTheorySlide() {
+            if (currentTheorySlideIndex > 0) {
+                currentTheorySlideIndex--;
+                loadTheorySlide();
+            }
+        }
+
+        // --- Lógica del Quiz ---
+        function loadQuestion() {
+            // Limpiar feedback anterior
+            feedbackMessage.textContent = '';
+            correctFeedbackIcon.classList.remove('correct-icon');
+            incorrectFeedbackIcon.classList.remove('incorrect-icon');
+
+            totalQuestionsDisplay.textContent = currentQuestions.length;
+            updateQuizProgressBar();
+
+            if (currentQuestionIndex < currentQuestions.length) {
+                const currentQuestion = currentQuestions[currentQuestionIndex];
+                questionDisplay.textContent = currentQuestion.question;
+                optionsContainer.innerHTML = ''; // Limpiar opciones anteriores
+                questionNumberDisplay.textContent = currentQuestionIndex + 1;
+
+                currentQuestion.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('option-button', 'w-full', 'block', 'px-4', 'py-3', 'rounded-lg', 'font-medium', 'transition', 'duration-200', 'ease-in-out', 'text-left');
+                    button.addEventListener('click', () => checkAnswer(option, button));
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                endGame();
+            }
+        }
+
+        function updateQuizProgressBar() {
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            quizProgressBar.style.width = `${progress}%`;
+        }
+
+        function checkAnswer(selectedOption, clickedButton) {
+            const questionData = currentQuestions[currentQuestionIndex];
+            const isCorrect = (selectedOption === questionData.answer);
+
+            // Deshabilitar todos los botones de opción para evitar múltiples clics
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+            });
+
+            if (isCorrect) {
+                score++;
+                scoreDisplay.textContent = score;
+                clickedButton.classList.add('correct');
+                feedbackMessage.textContent = '¡Correcto!';
+                animateFeedback(true, clickedButton);
+            } else {
+                clickedButton.classList.add('incorrect');
+                feedbackMessage.textContent = '¡Incorrecto!';
+                animateFeedback(false, clickedButton);
+
+                // Resaltar la respuesta correcta
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === questionData.answer) {
+                        button.classList.add('correct');
+                    }
+                });
+            }
+
+            // Esperar un momento antes de cargar la siguiente pregunta o terminar el juego
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1500); // 1.5 segundos para ver el feedback y la animación
+        }
+
+        function animateFeedback(isCorrect, button) {
+            const icon = isCorrect ? correctFeedbackIcon : incorrectFeedbackIcon;
+            // Position the icon relative to the clicked button
+            const rect = button.getBoundingClientRect();
+            const containerRect = gameContainer.getBoundingClientRect(); // Get game container position
+            icon.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
+            icon.style.top = `${rect.top - containerRect.top + rect.height / 2}px`;
+
+            icon.classList.add(isCorrect ? 'correct-icon' : 'incorrect-icon');
+
+            // Remove the animation class after it finishes to allow re-triggering
+            icon.addEventListener('animationend', () => {
+                icon.classList.remove(isCorrect ? 'correct-icon' : 'incorrect-icon');
+            }, { once: true });
+        }
+
+        function endGame() {
+            showScreen(resultsScreen);
+            finalScoreDisplay.textContent = `${score}/${currentQuestions.length}`;
+            const percentage = (score / currentQuestions.length) * 100;
+            if (percentage === 100) {
+                resultsMessage.textContent = '¡Felicidades, eres un maestro en este tema!';
+                resultsMessage.classList.add('text-green-600');
+                resultsMessage.classList.remove('text-blue-600', 'text-red-600');
+            } else if (percentage >= 70) {
+                resultsMessage.textContent = '¡Muy bien! Sigue practicando para alcanzar la perfección.';
+                resultsMessage.classList.add('text-blue-600');
+                resultsMessage.classList.remove('text-green-600', 'text-red-600');
+            } else {
+                resultsMessage.textContent = '¡No te desanimes! Repasa y vuelve a intentarlo.';
+                resultsMessage.classList.add('text-red-600');
+                resultsMessage.classList.remove('text-green-600', 'text-blue-600');
+            }
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', goToTopicSelection);
+        contractsTopicButton.addEventListener('click', () => startModule('contracts'));
+        laborTopicButton.addEventListener('click', () => startModule('labor'));
+        nextTheoryButton.addEventListener('click', nextTheorySlide);
+        prevTheoryButton.addEventListener('click', prevTheorySlide);
+        restartCurrentModuleButton.addEventListener('click', () => {
+            if (currentModule === 'labor') {
+                startModule('labor'); // Go back to theory for labor module
+            } else {
+                startModule(currentModule); // Restart quiz directly for contracts
+            }
+        });
+        backToTopicsButton.addEventListener('click', goToTopicSelection);
+
+        // Initial screen load
+        window.onload = () => {
+            showScreen(introScreen);
+        };
+    </script>
+</body>
+</html>
