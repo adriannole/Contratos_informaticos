@@ -1,721 +1,305 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contratos y Aspectos Laborales Informáticos: El Juego</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Casa Abierta: Auditoría Forense en la Era Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter and Press Start 2P for a game-like feel -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* Custom styles for game-like elements */
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient background */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 1rem; /* Add some padding for smaller screens */
-            box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal scroll on animations */
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff; /* FONDO BLANCO */
+            color: #1f2937; /* TEXTO OSCURO */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+        .font-anton { font-family: 'Anton', sans-serif; }
+        .brand-blue-dark { color: #07335F; }
+        .brand-blue-light { color: #0077CC; }
+        .brand-cyan { color: #06b6d4; }
+        .bg-brand-blue-dark { background-color: #07335F; }
 
-        #game-container {
-            font-family: 'Inter', sans-serif; /* Default font for content */
-            background-color: #ffffff;
-            border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            max-width: 90%; /* Responsive width */
-            width: 800px; /* Max width for larger screens */
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden; /* Hide overflow for animations */
-            border: 4px solid #4f46e5; /* Stronger border */
-            min-height: 550px; /* Ensure a minimum height for consistent layout */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .game-title {
-            font-family: 'Press Start 2P', cursive; /* Game title font */
-            color: #4f46e5; /* Indigo color */
-            font-size: 2.5rem; /* Larger title */
-            margin-bottom: 1.5rem;
-            text-shadow: 3px 3px 0px #312e81; /* Retro text shadow */
-        }
-
-        .game-button {
-            font-family: 'Press Start 2P', cursive;
-            background-color: #4f46e5; /* Indigo */
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 0.75rem;
-            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-bottom: 5px solid #312e81; /* Darker bottom border for 3D effect */
-        }
-
-        .game-button:hover {
-            background-color: #6366f1; /* Lighter indigo on hover */
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .game-button:active {
-            transform: translateY(2px); /* Press down effect */
-            border-bottom: 2px solid #312e81; /* Collapse 3D effect */
-        }
-
-        .option-button {
-            font-family: 'Inter', sans-serif;
-            background-color: #e0e7ff; /* Light indigo */
-            color: #312e81; /* Dark indigo */
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 2px solid #a5b4fc; /* Border for options */
-        }
-
-        .option-button:hover {
-            background-color: #c7d2fe; /* Lighter on hover */
-            transform: translateY(-1px);
-        }
-
-        .option-button:active {
-            transform: translateY(1px);
-        }
-
-        .option-button.correct {
-            background-color: #a7f3d0; /* Green for correct */
-            border-color: #34d399;
-            animation: pulse-green 0.5s ease-out forwards;
-        }
-
-        .option-button.incorrect {
-            background-color: #fecaca; /* Red for incorrect */
-            border-color: #ef4444;
-            animation: shake 0.3s ease-in-out forwards;
-        }
-
-        /* Animation for feedback icons */
-        .feedback-icon {
-            position: absolute;
-            font-size: 4rem;
+        /* --- Animaciones de entrada --- */
+        .reveal {
             opacity: 0;
-            transform: scale(0);
-            pointer-events: none; /* Allow clicks through */
-            z-index: 10;
+            transform: translateY(40px);
+            transition: opacity 1s ease-out, transform 0.8s ease-out;
         }
-
-        .feedback-icon.correct-icon {
-            color: #10b981; /* Green */
-            animation: pop-up-correct 0.8s ease-out forwards;
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .feedback-icon.incorrect-icon {
-            color: #ef4444; /* Red */
-            animation: pop-up-incorrect 0.8s ease-out forwards;
-        }
-
-        @keyframes pop-up-correct {
-            0% { opacity: 0; transform: scale(0) translateY(0); }
-            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
-            100% { opacity: 0; transform: scale(1) translateY(-50px); }
-        }
-
-        @keyframes pop-up-incorrect {
-            0% { opacity: 0; transform: scale(0) translateY(0); }
-            50% { opacity: 1; transform: scale(1.2) translateY(-20px) rotate(10deg); }
-            100% { opacity: 0; transform: scale(1) translateY(-50px) rotate(-10deg); }
-        }
-
-        @keyframes pulse-green {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(52, 211, 153, 0.7); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* Screen transitions */
-        .screen {
-            width: 100%;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        
+        /* --- Hero Section con Canvas 3D --- */
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            padding: 2rem;
-            box-sizing: border-box;
-            opacity: 0;
-            transform: translateX(100%);
-            display: flex; /* Use flex for centering content within screens */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100%; /* Ensure screens take full height of container */
-        }
-
-        .screen.active {
-            opacity: 1;
-            transform: translateX(0);
-            position: static; /* Take up space when active */
-        }
-
-        .screen.hidden {
-            display: none;
-        }
-
-        /* Progress bar styles */
-        .progress-bar-container {
             width: 100%;
-            background-color: #e0e7ff;
-            border-radius: 9999px;
-            height: 1rem;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            border: 1px solid #a5b4fc;
-        }
-
-        .progress-bar {
             height: 100%;
-            background-color: #4f46e5;
-            width: 0%;
-            border-radius: 9999px;
-            transition: width 0.5s ease-in-out;
+            z-index: 0;
         }
-
-        /* Theory slide specific styles */
-        .theory-slide {
-            background-color: #f0f4ff;
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* --- Estilos de las Tarjetas de Concepto Interactivas --- */
+        .concept-card {
+            background-color: white;
             border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(7, 51, 95, 0.1);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        .concept-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(7, 51, 95, 0.15);
+        }
+        .concept-header {
+            transition: background-color 0.5s ease;
+        }
+        .concept-card.active .concept-header {
+            background-color: #07335F;
+        }
+        .concept-card.active .concept-header h3 {
+            color: white;
+        }
+        .concept-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
+        }
+        .concept-card.active .concept-body {
+            max-height: 500px; /* Suficiente para el contenido */
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            min-height: 200px; /* Ensure consistent height for slides */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-            transform: scale(0.9);
-            opacity: 0;
         }
-        .theory-slide.active-slide {
-            transform: scale(1);
-            opacity: 1;
+        .concept-icon {
+            transition: transform 0.5s ease;
+        }
+        .concept-card.active .concept-icon {
+            transform: rotate(45deg);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .game-title {
-                font-size: 1.8rem;
-            }
-            #game-container {
-                padding: 1.5rem;
-            }
-            .game-button {
-                padding: 0.8rem 1.5rem;
-            }
-            .option-button {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-            }
-            .feedback-icon {
-                font-size: 3rem;
-            }
+        /* --- Slider con Glassmorphism --- */
+        .slider-container { position: relative; max-width: 900px; margin: auto; }
+        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide { min-width: 100%; box-sizing: border-box; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 1);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
+        .slider-button {
+            position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(7, 51, 95, 0.7); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease;
+        }
+        .slider-button:hover { background-color: #07335F; transform: translateY(-50%) scale(1.1); }
+        .prev-btn { left: 10px; }
+        .next-btn { right: 10px; }
+        .slider-dots { text-align: center; padding: 20px 0; }
+        .dot { cursor: pointer; height: 12px; width: 12px; margin: 0 5px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; transition: all 0.3s ease; }
+        .dot.active { background-color: #0077CC; transform: scale(1.2); }
 
-        @media (max-width: 480px) {
-            .game-title {
-                font-size: 1.5rem;
-            }
-            #game-container {
-                padding: 1rem;
-            }
-            .game-button {
-                padding: 0.7rem 1.2rem;
-                font-size: 0.9rem;
-            }
-            .option-button {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.8rem;
-            }
-            .feedback-icon {
-                font-size: 2.5rem;
-            }
-        }
     </style>
 </head>
-<body class="selection:bg-purple-300 selection:text-purple-900">
-    <div id="game-container" class="relative">
-        <!-- Pantalla de Introducción -->
-        <div id="intro-screen" class="screen active">
-            <h1 class="game-title mb-6">Contratos y Aspectos Laborales Informáticos: El Desafío</h1>
-            <p class="text-gray-700 text-lg mb-8 leading-relaxed">
-                ¡Bienvenido, futuro experto en el mundo legal de la informática! Ponte a prueba y descubre cuánto sabes sobre los contratos y los aspectos laborales clave en el sector tecnológico. ¡Responde correctamente para avanzar y convertirte en el campeón!
+<body class="overflow-x-hidden">
+
+    <!-- Hero Section -->
+    <header class="relative h-screen flex flex-col justify-center items-center text-center p-4">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-content">
+            <a href="https://ibb.co/XfTzT2rh"><img src="https://i.ibb.co/35H0Hr9D/LogoFICA.png" alt="LogoFICA" class="mx-auto h-48 md:h-56" border="0"></a>
+            <h1 class="text-4xl md:text-6xl font-bold brand-blue-dark uppercase tracking-wider reveal" style="transition-delay: 0.1s;">Casa Abierta</h1>
+            <h2 class="text-2xl md:text-4xl font-anton brand-blue-light uppercase tracking-widest reveal" style="transition-delay: 0.2s;">Auditoría Forense Digital</h2>
+            <p class="mt-6 max-w-2xl mx-auto text-slate-600 text-lg reveal" style="transition-delay: 0.3s;">
+                Explora los secretos de la ciberseguridad y descubre cómo protegemos la identidad en un mundo interconectado.
             </p>
-            <button id="start-button" class="game-button">¡Empezar Juego!</button>
         </div>
+    </header>
 
-        <!-- Pantalla de Selección de Tema -->
-        <div id="topic-selection-screen" class="screen hidden">
-            <h2 class="game-title mb-8">Selecciona tu Misión</h2>
-            <p class="text-gray-700 text-lg mb-8 leading-relaxed">
-                Elige el área de conocimiento que deseas explorar. ¡Cada misión te acercará a la maestría!
-            </p>
-            <div class="flex flex-col md:flex-row gap-6">
-                <button id="contracts-topic-button" class="game-button flex-1">Contratos Informáticos</button>
-                <button id="labor-topic-button" class="game-button flex-1">Aspectos Laborales Informáticos</button>
-            </div>
+    <!-- Sección de Conceptos Clave Interactiva -->
+    <section class="container mx-auto px-4 sm:px-6 py-16">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold brand-blue-dark">Los Pilares de la Seguridad Digital</h2>
+            <p class="mt-2 text-lg text-slate-600">Haz clic en cada concepto para descubrir su importancia.</p>
         </div>
+        <div class="max-w-5xl mx-auto grid md:grid-cols-3 md:items-start gap-6 md:gap-8">
+            
+            <!-- Card Auditoría Forense -->
+            <div class="concept-card reveal" onclick="toggleConcept(this)">
+                <div class="concept-header p-6 flex justify-between items-center bg-sky-100">
+                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">AUDITORÍA FORENSE</h3>
+                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
+                </div>
+                <div class="concept-body">
+                    <svg class="h-24 w-24 mx-auto text-sky-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10l-2.5 2.5M10 10l2.5-2.5M10 10l2.5 2.5M10 10l-2.5-2.5"/></svg>
+                    <p class="text-slate-600 text-sm">Investigación de evidencia digital post-incidente para esclarecer hechos y encontrar responsables ante la ley.</p>
+                </div>
+            </div>
 
-        <!-- Pantalla de Teoría (para Aspectos Laborales) -->
-        <div id="theory-screen" class="screen hidden">
-            <h2 class="game-title mb-6">Aspectos Laborales Informáticos: La Guía</h2>
-            <div class="progress-bar-container">
-                <div id="theory-progress-bar" class="progress-bar"></div>
+            <!-- Card Ciberseguridad -->
+            <div class="concept-card reveal" onclick="toggleConcept(this)">
+                <div class="concept-header p-6 flex justify-between items-center bg-blue-100">
+                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">CIBERSEGURIDAD</h3>
+                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
+                </div>
+                <div class="concept-body">
+                    <svg class="h-24 w-24 mx-auto text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.917L12 22l9-1.083A12.02 12.02 0 0017.618 5.984z" /></svg>
+                    <p class="text-slate-600 text-sm">Conjunto de prácticas y tecnologías para proteger sistemas, redes y datos de ataques y accesos no autorizados.</p>
+                </div>
             </div>
-            <div id="theory-content" class="w-full relative min-h-[250px]">
-                <!-- Las diapositivas de teoría se cargarán aquí -->
-            </div>
-            <div class="flex justify-between w-full mt-8 gap-4">
-                <button id="prev-theory-button" class="game-button opacity-50 cursor-not-allowed">Anterior</button>
-                <button id="next-theory-button" class="game-button">Siguiente</button>
-            </div>
-        </div>
 
-        <!-- Pantalla del Juego (Quiz) -->
-        <div id="game-screen" class="screen hidden">
-            <div class="progress-bar-container">
-                <div id="quiz-progress-bar" class="progress-bar"></div>
+            <!-- Card Concienciación -->
+            <div class="concept-card reveal" onclick="toggleConcept(this)">
+                <div class="concept-header p-6 flex justify-between items-center bg-indigo-100">
+                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">CONCIENCIACIÓN</h3>
+                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
+                </div>
+                <div class="concept-body">
+                    <svg class="h-24 w-24 mx-auto text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    <p class="text-slate-600 text-sm">Proceso de educar a los usuarios sobre los riesgos de seguridad y las mejores prácticas para prevenir incidentes.</p>
+                </div>
             </div>
-            <div class="flex justify-between items-center mb-6 w-full">
-                <p class="text-gray-600 text-lg font-bold">Puntuación: <span id="score-display" class="text-indigo-600">0</span></p>
-                <p class="text-gray-600 text-lg font-bold">Pregunta: <span id="question-number-display" class="text-indigo-600">1</span>/<span id="total-questions-display" class="text-indigo-600"></span></p>
-            </div>
-            <h2 id="question-display" class="text-2xl font-semibold text-gray-800 mb-8 leading-relaxed"></h2>
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 w-full">
-                <!-- Opciones se cargarán aquí -->
-            </div>
-            <div id="feedback-message" class="text-xl font-bold mt-4 h-8"></div>
-            <!-- Feedback icons (hidden by default, animated on answer) -->
-            <div id="correct-feedback" class="feedback-icon correct-icon absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">✅</div>
-            <div id="incorrect-feedback" class="feedback-icon incorrect-icon absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">❌</div>
         </div>
+    </section>
 
-        <!-- Pantalla de Resultados -->
-        <div id="results-screen" class="screen hidden">
-            <h2 class="game-title mb-6">¡Misión Cumplida!</h2>
-            <p class="text-gray-700 text-2xl mb-4">Tu Puntuación Final:</p>
-            <p id="final-score-display" class="game-title text-5xl mb-8"></p>
-            <p id="results-message" class="text-gray-600 text-lg mb-8"></p>
-            <div class="flex flex-col md:flex-row gap-4">
-                <button id="restart-current-module-button" class="game-button flex-1">Repetir Misión</button>
-                <button id="back-to-topics-button" class="game-button flex-1">Volver a Misiones</button>
-            </div>
+    <!-- Slider Interactivo de Riesgos -->
+    <main class="py-24 px-4 bg-slate-100">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-3xl md:text-5xl font-bold brand-blue-dark">Demostraciones de Riesgos Digitales</h2>
+            <p class="mt-4 text-lg text-slate-500">Desliza para explorar las amenazas más comunes.</p>
         </div>
-    </div>
+        <div class="slider-container reveal">
+            <div class="slider-wrapper">
+                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Archivos PDF con Sorpresas</h3> <p class="text-slate-600 mt-4">Un documento inofensivo puede contener scripts que instalan spyware, roban contraseñas o dan acceso remoto a tu equipo.</p> <div class="mt-6 bg-sky-50 p-4 rounded-lg border-l-4 border-sky-500"> <h4 class="font-bold text-sky-800">Prevención:</h4> <p class="text-sky-700 text-sm">Usa un antivirus actualizado y nunca abras archivos de fuentes desconocidas.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-sky-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M25 5H73V75H25z M40 5v15h18V5"></path><path stroke="#FF3B3B" d="M42 40 l16 16 M58 40 l-16 16"></path><circle cx="49" cy="27" r="4"></circle><path d="M40 65h18"></path></g></svg> </div> </div> </div>
+                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Códigos QR que Engañan</h3> <p class="text-slate-600 mt-4">Te redirigen a sitios de phishing para robar tus credenciales o inician la descarga de malware en tu dispositivo.</p> <div class="mt-6 bg-red-50 p-4 rounded-lg border-l-4 border-red-500"> <h4 class="font-bold text-red-800">Prevención:</h4> <p class="text-red-700 text-sm">Desconfía de códigos en lugares públicos. Usa apps que previsualicen la URL.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-red-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H80V60H20z M30 30h10v10H30z M60 30h10v10H60z M30 50h10v10H30z"></path><path d="M75 55c-8,15 -27,15 -35,0 C35 40 50 25 50 25 s15 15 25 30z m0 0 a5 5 0 1 1 -10 0 a5 5 0 1 1 10 0"></path><path stroke="#0077CC" d="M50 40h10 M50 50h20 M70 40h10"></path></g></svg> </div> </div> </div>
+                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">El Peligro del Wi-Fi Público</h3> <p class="text-slate-600 mt-4">Un atacante en la misma red puede interceptar tu tráfico, viendo tus mensajes, usuarios y contraseñas sin que te des cuenta.</p> <div class="mt-6 bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500"> <h4 class="font-bold text-amber-800">Prevención:</h4> <p class="text-amber-700 text-sm">Evita operaciones sensibles (banca, compras) y utiliza siempre una VPN.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-amber-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="#0077CC" d="M30 65 a 30 30 0 0 1 40 0 M20 55 a 45 45 0 0 1 60 0 M10 45 a 60 60 0 0 1 80 0"></path><path d="M75 20 a 10 10 0 1 1 -20 0 a 10 10 0 1 1 20 0 M65 30 v15 l-5-5 m5 5 l5-5 M55 35 h20"></path></g></svg> </div> </div> </div>
+                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Las Fotos que Hablan Demasiado</h3> <p class="text-slate-600 mt-4">Cada foto puede guardar tu ubicación exacta (metadatos EXIF), revelando dónde vives, trabajas o pasas tu tiempo libre.</p> <div class="mt-6 bg-green-50 p-4 rounded-lg border-l-4 border-green-500"> <h4 class="font-bold text-green-800">Prevención:</h4> <p class="text-green-700 text-sm">Desactiva el etiquetado geográfico en la cámara de tu móvil antes de tomar fotos.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-green-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="20" width="60" height="45" rx="5"></rect><circle stroke="#0077CC" cx="65" cy="32" r="4"></circle><path d="M20 50 l15-15 l15 10 l10-10 l20 15"></path><path stroke="#FF3B3B" d="M40 45 a 12 12 0 1 1 0 -24 a 12 12 0 0 1 0 24z m0-5 a 2 2 0 1 1 0-4 a 2 2 0 0 1 0 4z"></path></g></svg> </div> </div> </div>
+            </div>
+            <button type="button" class="slider-button prev-btn">&#10094;</button>
+            <button type="button" class="slider-button next-btn">&#10095;</button>
+            <div class="slider-dots"></div>
+        </div>
+    </main>
+
+    <!-- Footer - Nueva Invitación -->
+    <footer class="bg-gradient-to-r from-blue-700 to-sky-500 text-white mt-16">
+        <div class="container mx-auto px-6 py-16 text-center reveal">
+            <svg class="h-20 w-20 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z"/></svg>
+            <h2 class="text-3xl md:text-4xl font-bold">¡Estás Invitado!</h2>
+            <p class="text-lg mt-2 max-w-2xl mx-auto text-sky-100">Descubre el lado invisible de lo digital en nuestra <strong>Casa Abierta</strong> con casos de uso, evidencia real y muchas más.</p>
+        </div>
+    </footer>
+
 
     <script>
-        // --- Data del Juego ---
-        const questionsContracts = [
-            {
-                question: "¿Qué tipo de contrato informático se centra en el desarrollo de software a medida para un cliente específico?",
-                options: ["Contrato de Licencia de Software", "Contrato de Desarrollo de Software", "Contrato de Mantenimiento", "Contrato de Escrow"],
-                answer: "Contrato de Desarrollo de Software",
-                explanation: "El Contrato de Desarrollo de Software es un acuerdo donde una parte crea software personalizado para otra."
-            },
-            {
-                question: "¿Cuál es el propósito principal de un Contrato de Licencia de Software?",
-                options: ["Transferir la propiedad total del software", "Permitir el uso del software bajo ciertas condiciones", "Garantizar el mantenimiento del software", "Proteger el código fuente en caso de quiebra"],
-                answer: "Permitir el uso del software bajo ciertas condiciones",
-                explanation: "Una licencia otorga el derecho a usar el software, no a poseerlo, bajo términos y condiciones específicos."
-            },
-            {
-                question: "Un contrato que asegura que el código fuente de un software se mantenga en custodia por un tercero, para ser liberado bajo ciertas condiciones (ej. quiebra del desarrollador), se conoce como:",
-                options: ["Contrato de Outsourcing", "Contrato de Consultoría", "Contrato de Escrow de Software", "Contrato SaaS"],
-                answer: "Contrato de Escrow de Software",
-                explanation: "El Contrato de Escrow de Software protege al licenciatario al asegurar el acceso al código fuente en situaciones críticas."
-            },
-            {
-                question: "¿Qué tipo de contrato implica que un proveedor aloja y gestiona una aplicación a la que los clientes acceden a través de internet?",
-                options: ["Contrato de Venta de Hardware", "Contrato de Licencia Perpetua", "Contrato de Software como Servicio (SaaS)", "Contrato de Soporte Técnico"],
-                answer: "Contrato de Software como Servicio (SaaS)",
-                explanation: "SaaS es un modelo de entrega de software donde el proveedor aloja y gestiona la aplicación centralmente."
-            },
-            {
-                question: "¿Cuál de los siguientes NO es típicamente un elemento clave en un Contrato de Mantenimiento de Software?",
-                options: ["Actualizaciones y parches", "Soporte técnico", "Desarrollo de nuevas funcionalidades mayores", "Corrección de errores"],
-                answer: "Desarrollo de nuevas funcionalidades mayores",
-                explanation: "El mantenimiento generalmente cubre corrección de errores, actualizaciones y soporte, no el desarrollo de nuevas características significativas que suelen requerir un nuevo contrato."
-            },
-            {
-                question: "En un contrato de implementación de sistemas, ¿qué se espera principalmente del proveedor?",
-                options: ["Solo vender el software", "Instalar, configurar y poner en marcha un sistema informático", "Proveer únicamente consultoría legal", "Encargarse de la publicidad del sistema"],
-                answer: "Instalar, configurar y poner en marcha un sistema informático",
-                explanation: "Los contratos de implementación cubren la puesta en marcha de soluciones tecnológicas, desde la instalación hasta la configuración y pruebas."
-            },
-            {
-                question: "¿Qué contrato rige el uso de un programa de computadora de forma indefinida, con un pago único?",
-                options: ["Licencia por Suscripción", "Licencia Perpetua", "Licencia de Código Abierto", "Licencia de Prueba"],
-                answer: "Licencia Perpetua",
-                explanation: "La licencia perpetua permite el uso del software indefinidamente tras un pago único, a diferencia de las suscripciones."
-            },
-            {
-                question: "Cuando una empresa contrata a otra para gestionar su infraestructura de TI o procesos de negocio, ¿qué tipo de contrato es común?",
-                options: ["Contrato de Compraventa", "Contrato de Outsourcing o Subcontratación", "Contrato de Donación", "Contrato de Alquiler de Software"],
-                answer: "Contrato de Outsourcing o Subcontratación",
-                explanation: "El outsourcing implica delegar funciones o servicios a un proveedor externo especializado."
+        // --- Lógica para Hero 3D (DESACTIVADA EN MÓVIL PARA RENDIMIENTO) ---
+        if (window.innerWidth > 768) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const points = [];
+            for (let i = 0; i < 300; i++) {
+                const x = THREE.MathUtils.randFloatSpread(40);
+                const y = THREE.MathUtils.randFloatSpread(40);
+                const z = THREE.MathUtils.randFloatSpread(40);
+                points.push(new THREE.Vector3(x, y, z));
             }
-        ];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.PointsMaterial({ color: 0x07335F, size: 0.1 }); // Color oscuro para fondo claro
+            const starfield = new THREE.Points(geometry, material);
+            scene.add(starfield);
 
-        const theoryLaborAspects = [
-            {
-                title: "Introducción al Mundo Laboral IT",
-                content: "El mundo laboral de la informática es dinámico y tiene sus propias reglas. ¡Exploremos los aspectos clave que todo profesional y empresa debe conocer!",
-                icon: "💡"
-            },
-            {
-                title: "Relación Laboral vs. Prestación de Servicios",
-                content: "Es crucial distinguir entre una relación de dependencia laboral (empleado) y una de prestación de servicios (autónomo/freelance). La dependencia implica subordinación, horario y salario fijo, mientras que el freelance ofrece servicios por proyecto con independencia.",
-                icon: "⚖️"
-            },
-            {
-                title: "Contratos Laborales Comunes en TI",
-                content: "Los tipos de contratos laborales más comunes incluyen: <strong>Indefinido</strong> (sin fecha de fin), <strong>Por Obra o Servicio</strong> (para un proyecto específico), <strong>Temporal</strong> (duración definida) y de <strong>Prácticas/Formación</strong> (para estudiantes o recién graduados).",
-                icon: "📄"
-            },
-            {
-                title: "Propiedad Intelectual y Derechos de Autor",
-                content: "Generalmente, el software o las creaciones desarrolladas por un empleado en el marco de su trabajo son propiedad de la empresa, salvo que se pacte lo contrario en el contrato. ¡Las cláusulas de propiedad intelectual son vitales!",
-                icon: "©️"
-            },
-            {
-                title: "Confidencialidad y No Competencia",
-                content: "Las cláusulas de <strong>Confidencialidad</strong> prohíben divulgar información sensible. Las de <strong>No Competencia</strong> restringen al empleado de trabajar para competidores por un tiempo y geografía limitados tras finalizar la relación laboral.",
-                icon: "🔒"
-            },
-            {
-                title: "Teletrabajo y Aspectos Legales",
-                content: "El teletrabajo tiene regulaciones específicas en muchos países, incluyendo el derecho a la desconexión digital, la provisión de equipos y la gestión de gastos, y la prevención de riesgos laborales en el entorno remoto.",
-                icon: "💻"
-            },
-            {
-                title: "Protección de Datos Personales",
-                content: "Los profesionales de TI a menudo manejan datos sensibles. Es fundamental cumplir con normativas como GDPR o leyes locales de protección de datos, incluyendo cláusulas de tratamiento de datos en los contratos y responsabilidades claras.",
-                icon: "🛡️"
+            const linesMaterial = new THREE.LineBasicMaterial({ color: 0x0077CC, transparent: true, opacity: 0.2 }); // Opacidad ajustada
+            for (let i = 0; i < 50; i++) {
+                const p1 = points[Math.floor(Math.random() * points.length)];
+                const p2 = points[Math.floor(Math.random() * points.length)];
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+                const line = new THREE.Line(lineGeometry, linesMaterial);
+                scene.add(line);
             }
-        ];
+            
+            camera.position.z = 30;
 
-        const questionsLaborAspects = [
-            {
-                question: "¿Cuál es la principal característica que distingue una relación laboral de un contrato de prestación de servicios (freelance)?",
-                options: ["El tipo de software desarrollado", "La subordinación y dependencia", "El monto de los honorarios", "La duración del proyecto"],
-                answer: "La subordinación y dependencia",
-                explanation: "La relación laboral se define por la existencia de subordinación y dependencia del trabajador hacia el empleador."
-            },
-            {
-                question: "Si un desarrollador crea un software innovador para su empresa durante su jornada laboral, ¿quién suele ser el titular de los derechos de autor de ese software?",
-                options: ["El desarrollador", "La empresa", "Ambos a partes iguales", "Un tercero designado"],
-                answer: "La empresa",
-                explanation: "En la mayoría de las legislaciones, las obras creadas por un empleado en el cumplimiento de sus funciones laborales pertenecen al empleador."
-            },
-            {
-                question: "Una cláusula de 'no competencia' en un contrato laboral de TI busca principalmente:",
-                options: ["Impedir al empleado trabajar en cualquier otra empresa", "Restringir al empleado de trabajar para competidores por un tiempo limitado", "Asegurar que el empleado no revele secretos comerciales", "Obligar al empleado a seguir formándose"],
-                answer: "Restringir al empleado de trabajar para competidores por un tiempo limitado",
-                explanation: "La cláusula de no competencia post-contractual busca proteger los intereses de la empresa limitando la capacidad del ex-empleado de trabajar para un competidor directo."
-            },
-            {
-                question: "¿Qué derecho legal es fundamental para los empleados que realizan teletrabajo, especialmente en relación con las comunicaciones fuera del horario laboral?",
-                options: ["Derecho a un salario más alto", "Derecho a la desconexión digital", "Derecho a elegir su propio horario", "Derecho a no asistir a reuniones"],
-                answer: "Derecho a la desconexión digital",
-                explanation: "El derecho a la desconexión digital protege el tiempo personal y familiar del teletrabajador, evitando la obligación de responder comunicaciones fuera de su jornada."
-            },
-            {
-                question: "En el contexto de un contrato laboral informático, ¿qué significa que un contrato sea 'por obra o servicio determinado'?",
-                options: ["Que el contrato no tiene una fecha de fin", "Que el contrato es para un proyecto específico y termina al finalizarlo", "Que el empleado solo trabaja por horas", "Que el empleado es autónomo"],
-                answer: "Que el contrato es para un proyecto específico y termina al finalizarlo",
-                explanation: "Este tipo de contrato está vinculado a la realización de una obra o servicio con autonomía y sustantividad propia dentro de la actividad de la empresa."
+            const mouse = new THREE.Vector2();
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                starfield.rotation.x += 0.0002;
+                starfield.rotation.y += 0.0003;
+
+                camera.position.x += (mouse.x * 5 - camera.position.x) * 0.05;
+                camera.position.y += (mouse.y * 5 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+                
+                renderer.render(scene, camera);
             }
-        ];
+            animate();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // --- Lógica para Tarjetas de Concepto ---
+        function toggleConcept(element) {
+            element.classList.toggle('active');
+        }
 
-        // --- Elementos del DOM ---
-        const gameContainer = document.getElementById('game-container'); // Get the container for positioning feedback icons
-        const introScreen = document.getElementById('intro-screen');
-        const topicSelectionScreen = document.getElementById('topic-selection-screen');
-        const theoryScreen = document.getElementById('theory-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const resultsScreen = document.getElementById('results-screen');
-
-        const startButton = document.getElementById('start-button');
-        const contractsTopicButton = document.getElementById('contracts-topic-button');
-        const laborTopicButton = document.getElementById('labor-topic-button');
-        const restartCurrentModuleButton = document.getElementById('restart-current-module-button');
-        const backToTopicsButton = document.getElementById('back-to-topics-button');
-
-        const theoryProgressBar = document.getElementById('theory-progress-bar');
-        const theoryContent = document.getElementById('theory-content');
-        const prevTheoryButton = document.getElementById('prev-theory-button');
-        const nextTheoryButton = document.getElementById('next-theory-button');
-
-        const quizProgressBar = document.getElementById('quiz-progress-bar');
-        const scoreDisplay = document.getElementById('score-display');
-        const questionNumberDisplay = document.getElementById('question-number-display');
-        const totalQuestionsDisplay = document.getElementById('total-questions-display');
-        const questionDisplay = document.getElementById('question-display');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const finalScoreDisplay = document.getElementById('final-score-display');
-        const resultsMessage = document.getElementById('results-message');
-        const correctFeedbackIcon = document.getElementById('correct-feedback');
-        const incorrectFeedbackIcon = document.getElementById('incorrect-feedback');
-
-        // --- Variables de Estado del Juego ---
-        let currentModule = ''; // 'contracts' or 'labor'
-        let currentQuestions = [];
-        let currentTheorySlides = [];
-        let currentQuestionIndex = 0;
-        let currentTheorySlideIndex = 0;
-        let score = 0;
-
-        // --- Funciones de Navegación de Pantallas ---
-        function showScreen(screenToShow) {
-            const allScreens = [introScreen, topicSelectionScreen, theoryScreen, gameScreen, resultsScreen];
-            allScreens.forEach(screen => {
-                if (screen === screenToShow) {
-                    screen.classList.remove('hidden');
-                    // Trigger reflow to restart transition
-                    void screen.offsetWidth; // This forces a reflow
-                    screen.classList.add('active');
-                } else {
-                    screen.classList.remove('active');
-                    // Add hidden after transition for elements not visible
-                    setTimeout(() => {
-                        if (!screen.classList.contains('active')) {
-                            screen.classList.add('hidden');
-                        }
-                    }, 500); // Match transition duration
+        // --- Lógica del Slider ---
+        const sliderWrapper = document.querySelector('.slider-wrapper');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const dotsContainer = document.querySelector('.slider-dots');
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        if (totalSlides > 0) {
+            slides.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            });
+            const dots = document.querySelectorAll('.dot');
+            function goToSlide(index) {
+                currentIndex = (index + totalSlides) % totalSlides;
+                sliderWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.forEach(d => d.classList.remove('active'));
+                dots[currentIndex].classList.add('active');
+            }
+            prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+            nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+            goToSlide(0);
+        }
+        
+        // --- Lógica de Animación al Scroll ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
                 }
             });
-        }
-
-        // --- Lógica del Juego ---
-
-        function goToTopicSelection() {
-            showScreen(topicSelectionScreen);
-        }
-
-        function startModule(moduleName) {
-            currentModule = moduleName;
-            currentQuestionIndex = 0;
-            score = 0;
-            scoreDisplay.textContent = score;
-
-            if (currentModule === 'contracts') {
-                currentQuestions = questionsContracts;
-                showScreen(gameScreen);
-                loadQuestion();
-            } else if (currentModule === 'labor') {
-                currentTheorySlides = theoryLaborAspects;
-                currentQuestions = questionsLaborAspects;
-                currentTheorySlideIndex = 0;
-                showScreen(theoryScreen);
-                loadTheorySlide();
-            }
-        }
-
-        // --- Lógica de Teoría ---
-        function loadTheorySlide() {
-            theoryContent.innerHTML = ''; // Clear previous slides
-            const slide = currentTheorySlides[currentTheorySlideIndex];
-            const slideDiv = document.createElement('div');
-            slideDiv.classList.add('theory-slide', 'w-full', 'mx-auto', 'p-6', 'rounded-xl', 'shadow-md', 'mb-4');
-            slideDiv.innerHTML = `
-                <h3 class="text-2xl font-bold text-indigo-700 mb-4 flex items-center justify-center gap-2">
-                    <span class="text-4xl">${slide.icon || '📚'}</span> ${slide.title}
-                </h3>
-                <p class="text-gray-800 text-lg leading-relaxed">${slide.content}</p>
-            `;
-            theoryContent.appendChild(slideDiv);
-
-            // Animate in the new slide
-            setTimeout(() => {
-                slideDiv.classList.add('active-slide');
-            }, 50); // Small delay to ensure transition applies
-
-            updateTheoryProgressBar();
-            updateTheoryNavigationButtons();
-        }
-
-        function updateTheoryProgressBar() {
-            const progress = ((currentTheorySlideIndex + 1) / currentTheorySlides.length) * 100;
-            theoryProgressBar.style.width = `${progress}%`;
-        }
-
-        function updateTheoryNavigationButtons() {
-            prevTheoryButton.disabled = currentTheorySlideIndex === 0;
-            prevTheoryButton.classList.toggle('opacity-50', currentTheorySlideIndex === 0);
-            prevTheoryButton.classList.toggle('cursor-not-allowed', currentTheorySlideIndex === 0);
-
-            nextTheoryButton.textContent = currentTheorySlideIndex === currentTheorySlides.length - 1 ? '¡Empezar Quiz!' : 'Siguiente';
-        }
-
-        function nextTheorySlide() {
-            if (currentTheorySlideIndex < currentTheorySlides.length - 1) {
-                currentTheorySlideIndex++;
-                loadTheorySlide();
-            } else {
-                // End of theory, start quiz
-                showScreen(gameScreen);
-                loadQuestion();
-            }
-        }
-
-        function prevTheorySlide() {
-            if (currentTheorySlideIndex > 0) {
-                currentTheorySlideIndex--;
-                loadTheorySlide();
-            }
-        }
-
-        // --- Lógica del Quiz ---
-        function loadQuestion() {
-            // Limpiar feedback anterior
-            feedbackMessage.textContent = '';
-            correctFeedbackIcon.classList.remove('correct-icon');
-            incorrectFeedbackIcon.classList.remove('incorrect-icon');
-
-            totalQuestionsDisplay.textContent = currentQuestions.length;
-            updateQuizProgressBar();
-
-            if (currentQuestionIndex < currentQuestions.length) {
-                const currentQuestion = currentQuestions[currentQuestionIndex];
-                questionDisplay.textContent = currentQuestion.question;
-                optionsContainer.innerHTML = ''; // Limpiar opciones anteriores
-                questionNumberDisplay.textContent = currentQuestionIndex + 1;
-
-                currentQuestion.options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.textContent = option;
-                    button.classList.add('option-button', 'w-full', 'block', 'px-4', 'py-3', 'rounded-lg', 'font-medium', 'transition', 'duration-200', 'ease-in-out', 'text-left');
-                    button.addEventListener('click', () => checkAnswer(option, button));
-                    optionsContainer.appendChild(button);
-                });
-            } else {
-                endGame();
-            }
-        }
-
-        function updateQuizProgressBar() {
-            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
-            quizProgressBar.style.width = `${progress}%`;
-        }
-
-        function checkAnswer(selectedOption, clickedButton) {
-            const questionData = currentQuestions[currentQuestionIndex];
-            const isCorrect = (selectedOption === questionData.answer);
-
-            // Deshabilitar todos los botones de opción para evitar múltiples clics
-            Array.from(optionsContainer.children).forEach(button => {
-                button.disabled = true;
-            });
-
-            if (isCorrect) {
-                score++;
-                scoreDisplay.textContent = score;
-                clickedButton.classList.add('correct');
-                feedbackMessage.textContent = '¡Correcto!';
-                animateFeedback(true, clickedButton);
-            } else {
-                clickedButton.classList.add('incorrect');
-                feedbackMessage.textContent = '¡Incorrecto!';
-                animateFeedback(false, clickedButton);
-
-                // Resaltar la respuesta correcta
-                Array.from(optionsContainer.children).forEach(button => {
-                    if (button.textContent === questionData.answer) {
-                        button.classList.add('correct');
-                    }
-                });
-            }
-
-            // Esperar un momento antes de cargar la siguiente pregunta o terminar el juego
-            setTimeout(() => {
-                currentQuestionIndex++;
-                loadQuestion();
-            }, 1500); // 1.5 segundos para ver el feedback y la animación
-        }
-
-        function animateFeedback(isCorrect, button) {
-            const icon = isCorrect ? correctFeedbackIcon : incorrectFeedbackIcon;
-            // Position the icon relative to the clicked button
-            const rect = button.getBoundingClientRect();
-            const containerRect = gameContainer.getBoundingClientRect(); // Get game container position
-            icon.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
-            icon.style.top = `${rect.top - containerRect.top + rect.height / 2}px`;
-
-            icon.classList.add(isCorrect ? 'correct-icon' : 'incorrect-icon');
-
-            // Remove the animation class after it finishes to allow re-triggering
-            icon.addEventListener('animationend', () => {
-                icon.classList.remove(isCorrect ? 'correct-icon' : 'incorrect-icon');
-            }, { once: true });
-        }
-
-        function endGame() {
-            showScreen(resultsScreen);
-            finalScoreDisplay.textContent = `${score}/${currentQuestions.length}`;
-            const percentage = (score / currentQuestions.length) * 100;
-            if (percentage === 100) {
-                resultsMessage.textContent = '¡Felicidades, eres un maestro en este tema!';
-                resultsMessage.classList.add('text-green-600');
-                resultsMessage.classList.remove('text-blue-600', 'text-red-600');
-            } else if (percentage >= 70) {
-                resultsMessage.textContent = '¡Muy bien! Sigue practicando para alcanzar la perfección.';
-                resultsMessage.classList.add('text-blue-600');
-                resultsMessage.classList.remove('text-green-600', 'text-red-600');
-            } else {
-                resultsMessage.textContent = '¡No te desanimes! Repasa y vuelve a intentarlo.';
-                resultsMessage.classList.add('text-red-600');
-                resultsMessage.classList.remove('text-green-600', 'text-blue-600');
-            }
-        }
-
-        // --- Event Listeners ---
-        startButton.addEventListener('click', goToTopicSelection);
-        contractsTopicButton.addEventListener('click', () => startModule('contracts'));
-        laborTopicButton.addEventListener('click', () => startModule('labor'));
-        nextTheoryButton.addEventListener('click', nextTheorySlide);
-        prevTheoryButton.addEventListener('click', prevTheorySlide);
-        restartCurrentModuleButton.addEventListener('click', () => {
-            if (currentModule === 'labor') {
-                startModule('labor'); // Go back to theory for labor module
-            } else {
-                startModule(currentModule); // Restart quiz directly for contracts
-            }
-        });
-        backToTopicsButton.addEventListener('click', goToTopicSelection);
-
-        // Initial screen load
-        window.onload = () => {
-            showScreen(introScreen);
-        };
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => scrollObserver.observe(el));
     </script>
+
 </body>
 </html>
