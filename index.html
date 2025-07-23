@@ -1,304 +1,233 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casa Abierta: Auditoría Forense en la Era Digital</title>
+    <title>Monitoreo Inteligente del Agua para Quito</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #ffffff; /* FONDO BLANCO */
-            color: #1f2937; /* TEXTO OSCURO */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
-        .font-anton { font-family: 'Anton', sans-serif; }
-        .brand-blue-dark { color: #07335F; }
-        .brand-blue-light { color: #0077CC; }
-        .brand-cyan { color: #06b6d4; }
-        .bg-brand-blue-dark { background-color: #07335F; }
-
-        /* --- Animaciones de entrada --- */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s ease-out, transform 0.8s ease-out;
+        .gradient-bg {
+            background: linear-gradient(135deg, #e0f7fa, #ffffff);
         }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .water-flow {
+            animation: flow 10s linear infinite;
         }
-        
-        /* --- Hero Section con Canvas 3D --- */
-        #hero-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
+        @keyframes flow {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
         }
-        .hero-content {
-            position: relative;
-            z-index: 1;
+        .icon-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        /* --- Estilos de las Tarjetas de Concepto Interactivas --- */
-        .concept-card {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(7, 51, 95, 0.1);
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
-        .concept-card:hover {
+        .icon-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(7, 51, 95, 0.15);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
-        .concept-header {
-            transition: background-color 0.5s ease;
+        .slide {
+            min-height: 100vh;
+            scroll-snap-align: start;
         }
-        .concept-card.active .concept-header {
-            background-color: #07335F;
+        .scroll-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
         }
-        .concept-card.active .concept-header h3 {
-            color: white;
-        }
-        .concept-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
-        }
-        .concept-card.active .concept-body {
-            max-height: 500px; /* Suficiente para el contenido */
-            padding: 1.5rem;
-        }
-        .concept-icon {
-            transition: transform 0.5s ease;
-        }
-        .concept-card.active .concept-icon {
-            transform: rotate(45deg);
-        }
-
-        /* --- Slider con Glassmorphism --- */
-        .slider-container { position: relative; max-width: 900px; margin: auto; }
-        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
-        .slide { min-width: 100%; box-sizing: border-box; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 1);
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .slider-button {
-            position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(7, 51, 95, 0.7); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease;
-        }
-        .slider-button:hover { background-color: #07335F; transform: translateY(-50%) scale(1.1); }
-        .prev-btn { left: 10px; }
-        .next-btn { right: 10px; }
-        .slider-dots { text-align: center; padding: 20px 0; }
-        .dot { cursor: pointer; height: 12px; width: 12px; margin: 0 5px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; transition: all 0.3s ease; }
-        .dot.active { background-color: #0077CC; transform: scale(1.2); }
-
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- Hero Section -->
-    <header class="relative h-screen flex flex-col justify-center items-center text-center p-4">
-        <canvas id="hero-canvas"></canvas>
-        <div class="hero-content">
-            <a href="https://ibb.co/XfTzT2rh"><img src="https://i.ibb.co/35H0Hr9D/LogoFICA.png" alt="LogoFICA" class="mx-auto h-48 md:h-56" border="0"></a>
-            <h1 class="text-4xl md:text-6xl font-bold brand-blue-dark uppercase tracking-wider reveal" style="transition-delay: 0.1s;">Casa Abierta</h1>
-            <h2 class="text-2xl md:text-4xl font-anton brand-blue-light uppercase tracking-widest reveal" style="transition-delay: 0.2s;">Auditoría Forense Digital</h2>
-            <p class="mt-6 max-w-2xl mx-auto text-slate-600 text-lg reveal" style="transition-delay: 0.3s;">
-                Explora los secretos de la ciberseguridad y descubre cómo protegemos la identidad en un mundo interconectado.
-            </p>
-        </div>
-    </header>
+    <div class="scroll-container">
 
-    <!-- Sección de Conceptos Clave Interactiva -->
-    <section class="container mx-auto px-4 sm:px-6 py-16">
-        <div class="text-center mb-12 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold brand-blue-dark">Los Pilares de la Seguridad Digital</h2>
-            <p class="mt-2 text-lg text-slate-600">Haz clic en cada concepto para descubrir su importancia.</p>
-        </div>
-        <div class="max-w-5xl mx-auto grid md:grid-cols-3 md:items-start gap-6 md:gap-8">
-            
-            <!-- Card Auditoría Forense -->
-            <div class="concept-card reveal" onclick="toggleConcept(this)">
-                <div class="concept-header p-6 flex justify-between items-center bg-sky-100">
-                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">AUDITORÍA FORENSE</h3>
-                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
+        <!-- Slide 1: ¿Qué es y para qué sirve? -->
+        <section id="slide1" class="slide flex items-center justify-center gradient-bg p-4 md:p-8">
+            <div class="container mx-auto px-4">
+                <header class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-bold text-cyan-800 mb-2">Monitoreo Inteligente del Agua para Quito</h1>
+                    <p class="text-lg md:text-xl text-cyan-700 font-light">Con tecnología e inteligencia artificial cuidamos tus fuentes hídricas</p>
+                </header>
+
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12">
+                    <!-- Diagrama del Flujo del Agua -->
+                    <div class="w-full lg:w-1/2 p-4">
+                        <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Papallacta (Montañas) -->
+                            <path d="M 50 150 Q 70 100 100 150 T 150 150 L 50 150 Z" fill="#a7d8de"/>
+                            <path d="M 20 150 Q 50 80 80 150 T 130 150 L 20 150 Z" fill="#60a5fa"/>
+                            <text x="75" y="60" font-size="14" font-weight="bold" fill="#0e7490" text-anchor="middle">Papallacta</text>
+                            
+                            <!-- Flujo de Agua (Río) -->
+                            <path d="M 100 150 C 150 180, 200 120, 250 160 S 320 220, 350 190" stroke="#38bdf8" stroke-width="4" fill="none" class="water-flow" stroke-dasharray="10"/>
+
+                            <!-- Quito (Ciudad) -->
+                            <rect x="300" y="150" width="15" height="40" fill="#9ca3af"/>
+                            <rect x="320" y="130" width="20" height="60" fill="#6b7280"/>
+                            <rect x="345" y="160" width="15" height="30" fill="#9ca3af"/>
+                            <rect x="365" y="140" width="10" height="50" fill="#6b7280"/>
+                            <text x="340" y="210" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle">Quito</text>
+                        </svg>
+                    </div>
+
+                    <!-- Beneficios Clave -->
+                    <div class="w-full lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Beneficio 1 -->
+                        <div class="icon-card bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 18v-1m0-1v-.01m0-1.99V14m0-2.01V12m0 6c-1.11 0-2.08-.402-2.599-1M12 16v1m0 1v1m0-2.01V16"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-700">Predicción Inteligente</h3>
+                                    <p class="text-sm text-gray-500">Anticipamos lluvias, caudales y calidad del agua.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Beneficio 2 -->
+                        <div class="icon-card bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-yellow-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-700">Alertas Tempranas</h3>
+                                    <p class="text-sm text-gray-500">Notificaciones automáticas ante posibles riesgos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Beneficio 3 -->
+                        <div class="icon-card bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-700">Datos en Tiempo Real</h3>
+                                    <p class="text-sm text-gray-500">Acceso inmediato a la información hidrológica.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Beneficio 4 -->
+                        <div class="icon-card bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-purple-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5l4 4v10a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-700">Decisiones Estratégicas</h3>
+                                    <p class="text-sm text-gray-500">Herramienta clave para la gestión operativa.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="concept-body">
-                    <svg class="h-24 w-24 mx-auto text-sky-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10l-2.5 2.5M10 10l2.5-2.5M10 10l2.5 2.5M10 10l-2.5-2.5"/></svg>
-                    <p class="text-slate-600 text-sm">Investigación de evidencia digital post-incidente para esclarecer hechos y encontrar responsables ante la ley.</p>
-                </div>
-            </div>
-
-            <!-- Card Ciberseguridad -->
-            <div class="concept-card reveal" onclick="toggleConcept(this)">
-                <div class="concept-header p-6 flex justify-between items-center bg-blue-100">
-                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">CIBERSEGURIDAD</h3>
-                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
-                </div>
-                <div class="concept-body">
-                    <svg class="h-24 w-24 mx-auto text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.917L12 22l9-1.083A12.02 12.02 0 0017.618 5.984z" /></svg>
-                    <p class="text-slate-600 text-sm">Conjunto de prácticas y tecnologías para proteger sistemas, redes y datos de ataques y accesos no autorizados.</p>
-                </div>
-            </div>
-
-            <!-- Card Concienciación -->
-            <div class="concept-card reveal" onclick="toggleConcept(this)">
-                <div class="concept-header p-6 flex justify-between items-center bg-indigo-100">
-                    <h3 class="font-anton text-xl sm:text-2xl brand-blue-dark tracking-wider">CONCIENCIACIÓN</h3>
-                    <div class="concept-icon text-2xl brand-blue-light transform">&#10133;</div>
-                </div>
-                <div class="concept-body">
-                    <svg class="h-24 w-24 mx-auto text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                    <p class="text-slate-600 text-sm">Proceso de educar a los usuarios sobre los riesgos de seguridad y las mejores prácticas para prevenir incidentes.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slider Interactivo de Riesgos -->
-    <main class="py-24 px-4 bg-slate-100">
-        <div class="text-center mb-16 reveal">
-            <h2 class="text-3xl md:text-5xl font-bold brand-blue-dark">Demostraciones de Riesgos Digitales</h2>
-            <p class="mt-4 text-lg text-slate-500">Desliza para explorar las amenazas más comunes.</p>
-        </div>
-        <div class="slider-container reveal">
-            <div class="slider-wrapper">
-                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Archivos PDF con Sorpresas</h3> <p class="text-slate-600 mt-4">Un documento inofensivo puede contener scripts que instalan spyware, roban contraseñas o dan acceso remoto a tu equipo.</p> <div class="mt-6 bg-sky-50 p-4 rounded-lg border-l-4 border-sky-500"> <h4 class="font-bold text-sky-800">Prevención:</h4> <p class="text-sky-700 text-sm">Usa un antivirus actualizado y nunca abras archivos de fuentes desconocidas.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-sky-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M25 5H73V75H25z M40 5v15h18V5"></path><path stroke="#FF3B3B" d="M42 40 l16 16 M58 40 l-16 16"></path><circle cx="49" cy="27" r="4"></circle><path d="M40 65h18"></path></g></svg> </div> </div> </div>
-                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Códigos QR que Engañan</h3> <p class="text-slate-600 mt-4">Te redirigen a sitios de phishing para robar tus credenciales o inician la descarga de malware en tu dispositivo.</p> <div class="mt-6 bg-red-50 p-4 rounded-lg border-l-4 border-red-500"> <h4 class="font-bold text-red-800">Prevención:</h4> <p class="text-red-700 text-sm">Desconfía de códigos en lugares públicos. Usa apps que previsualicen la URL.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-red-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H80V60H20z M30 30h10v10H30z M60 30h10v10H60z M30 50h10v10H30z"></path><path d="M75 55c-8,15 -27,15 -35,0 C35 40 50 25 50 25 s15 15 25 30z m0 0 a5 5 0 1 1 -10 0 a5 5 0 1 1 10 0"></path><path stroke="#0077CC" d="M50 40h10 M50 50h20 M70 40h10"></path></g></svg> </div> </div> </div>
-                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">El Peligro del Wi-Fi Público</h3> <p class="text-slate-600 mt-4">Un atacante en la misma red puede interceptar tu tráfico, viendo tus mensajes, usuarios y contraseñas sin que te des cuenta.</p> <div class="mt-6 bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500"> <h4 class="font-bold text-amber-800">Prevención:</h4> <p class="text-amber-700 text-sm">Evita operaciones sensibles (banca, compras) y utiliza siempre una VPN.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-amber-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="#0077CC" d="M30 65 a 30 30 0 0 1 40 0 M20 55 a 45 45 0 0 1 60 0 M10 45 a 60 60 0 0 1 80 0"></path><path d="M75 20 a 10 10 0 1 1 -20 0 a 10 10 0 1 1 20 0 M65 30 v15 l-5-5 m5 5 l5-5 M55 35 h20"></path></g></svg> </div> </div> </div>
-                <div class="slide p-4"> <div class="glass-card p-6 md:p-10 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"> <div class="md:col-span-3 text-center md:text-left"> <h3 class="text-2xl md:text-3xl font-bold brand-blue-dark">Las Fotos que Hablan Demasiado</h3> <p class="text-slate-600 mt-4">Cada foto puede guardar tu ubicación exacta (metadatos EXIF), revelando dónde vives, trabajas o pasas tu tiempo libre.</p> <div class="mt-6 bg-green-50 p-4 rounded-lg border-l-4 border-green-500"> <h4 class="font-bold text-green-800">Prevención:</h4> <p class="text-green-700 text-sm">Desactiva el etiquetado geográfico en la cámara de tu móvil antes de tomar fotos.</p> </div> </div> <div class="md:col-span-2 flex justify-center"> <svg class="h-32 w-32 md:h-40 md:w-40 text-green-500" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="20" width="60" height="45" rx="5"></rect><circle stroke="#0077CC" cx="65" cy="32" r="4"></circle><path d="M20 50 l15-15 l15 10 l10-10 l20 15"></path><path stroke="#FF3B3B" d="M40 45 a 12 12 0 1 1 0 -24 a 12 12 0 0 1 0 24z m0-5 a 2 2 0 1 1 0-4 a 2 2 0 0 1 0 4z"></path></g></svg> </div> </div> </div>
-            </div>
-            <button type="button" class="slider-button prev-btn">&#10094;</button>
-            <button type="button" class="slider-button next-btn">&#10095;</button>
-            <div class="slider-dots"></div>
-        </div>
-    </main>
-
-    <!-- Footer - Nueva Invitación -->
-    <footer class="bg-gradient-to-r from-blue-700 to-sky-500 text-white mt-16">
-        <div class="container mx-auto px-6 py-16 text-center reveal">
-            <svg class="h-20 w-20 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z"/></svg>
-            <h2 class="text-3xl md:text-4xl font-bold">¡Estás Invitado!</h2>
-            <p class="text-lg mt-2 max-w-2xl mx-auto text-sky-100">Descubre el lado invisible de lo digital en nuestra <strong>Casa Abierta</strong> con casos de uso, evidencia real y muchas más.</p>
-        </div>
-    </footer>
-
-
-    <script>
-        // --- Lógica para Hero 3D (DESACTIVADA EN MÓVIL PARA RENDIMIENTO) ---
-        if (window.innerWidth > 768) {
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-            const points = [];
-            for (let i = 0; i < 300; i++) {
-                const x = THREE.MathUtils.randFloatSpread(40);
-                const y = THREE.MathUtils.randFloatSpread(40);
-                const z = THREE.MathUtils.randFloatSpread(40);
-                points.push(new THREE.Vector3(x, y, z));
-            }
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const material = new THREE.PointsMaterial({ color: 0x07335F, size: 0.1 }); // Color oscuro para fondo claro
-            const starfield = new THREE.Points(geometry, material);
-            scene.add(starfield);
-
-            const linesMaterial = new THREE.LineBasicMaterial({ color: 0x0077CC, transparent: true, opacity: 0.2 }); // Opacidad ajustada
-            for (let i = 0; i < 50; i++) {
-                const p1 = points[Math.floor(Math.random() * points.length)];
-                const p2 = points[Math.floor(Math.random() * points.length)];
-                const lineGeometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
-                const line = new THREE.Line(lineGeometry, linesMaterial);
-                scene.add(line);
-            }
-            
-            camera.position.z = 30;
-
-            const mouse = new THREE.Vector2();
-            window.addEventListener('mousemove', (event) => {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-                starfield.rotation.x += 0.0002;
-                starfield.rotation.y += 0.0003;
-
-                camera.position.x += (mouse.x * 5 - camera.position.x) * 0.05;
-                camera.position.y += (mouse.y * 5 - camera.position.y) * 0.05;
-                camera.lookAt(scene.position);
                 
-                renderer.render(scene, camera);
-            }
-            animate();
-            
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-        
-        // --- Lógica para Tarjetas de Concepto ---
-        function toggleConcept(element) {
-            element.classList.toggle('active');
-        }
+                <!-- Scroll down indicator -->
+                <div class="text-center mt-12 animate-bounce">
+                    <a href="#slide2" class="inline-block">
+                        <span class="text-sm text-cyan-600">Ver cómo funciona</span>
+                        <svg class="w-6 h-6 mx-auto text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-        // --- Lógica del Slider ---
-        const sliderWrapper = document.querySelector('.slider-wrapper');
-        const slides = document.querySelectorAll('.slide');
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-        const dotsContainer = document.querySelector('.slider-dots');
-        let currentIndex = 0;
-        const totalSlides = slides.length;
-        if (totalSlides > 0) {
-            slides.forEach((_, i) => {
-                const dot = document.createElement('span');
-                dot.classList.add('dot');
-                dot.addEventListener('click', () => goToSlide(i));
-                dotsContainer.appendChild(dot);
+        <!-- Slide 2: ¿Cómo funciona? -->
+        <section id="slide2" class="slide flex items-center justify-center bg-white p-4 md:p-8">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-800 mb-12">¿Cómo Funciona Nuestra Plataforma?</h2>
+                
+                <!-- Arquitectura Simplificada -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-16">
+                    <div class="text-center p-6 bg-gray-100 rounded-xl shadow-md w-full md:w-1/4">
+                        <h3 class="text-lg font-semibold text-sky-600">1. Captura de Datos</h3>
+                        <p class="text-sm text-gray-600">Sensores y APIs oficiales (INAMHI, etc.)</p>
+                    </div>
+                    <div class="text-sky-500 text-3xl font-bold transform md:-rotate-0 rotate-90">&rarr;</div>
+                    <div class="text-center p-6 bg-gray-100 rounded-xl shadow-md w-full md:w-1/3">
+                        <h3 class="text-lg font-semibold text-sky-600">2. Procesamiento IA</h3>
+                        <p class="text-sm text-gray-600">Modelo Predictivo ARIMA + Análisis con Gemini</p>
+                    </div>
+                    <div class="text-sky-500 text-3xl font-bold transform md:-rotate-0 rotate-90">&rarr;</div>
+                    <div class="text-center p-6 bg-gray-100 rounded-xl shadow-md w-full md:w-1/4">
+                        <h3 class="text-lg font-semibold text-sky-600">3. Visualización</h3>
+                        <p class="text-sm text-gray-600">Dashboard Interactivo</p>
+                    </div>
+                </div>
+
+                <!-- Muestra de Interfaz -->
+                <div class="bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-2xl max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                         <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        </div>
+                        <p class="text-white/80 text-sm font-mono">Panel de Control Hidrológico</p>
+                    </div>
+                    <div class="bg-gray-900/70 rounded-lg p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <!-- Mapa y Alertas -->
+                        <div class="lg:col-span-2 bg-gray-700 rounded-lg p-4">
+                            <p class="text-white mb-2">📍 Mapa de Monitoreo</p>
+                            <div class="aspect-video bg-blue-400/30 rounded flex items-center justify-center">
+                                <p class="text-white/50">Simulación de mapa interactivo</p>
+                            </div>
+                        </div>
+                        <!-- Alertas y Gráficos -->
+                        <div class="space-y-4">
+                            <div class="bg-gray-700 rounded-lg p-3">
+                                <p class="text-white mb-2 text-sm">🚨 Nivel de Alerta Actual</p>
+                                <div class="bg-green-500 text-white text-center font-bold py-2 rounded">VERDE: Normal</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-3">
+                                <p class="text-white mb-2 text-sm">📈 Predicción Caudal (24h)</p>
+                                <div class="h-20 bg-blue-400/30 rounded flex items-end p-1">
+                                    <div class="w-1/4 bg-blue-300 h-1/2 rounded-t-sm"></div>
+                                    <div class="w-1/4 bg-blue-300 h-3/4 rounded-t-sm"></div>
+                                    <div class="w-1/4 bg-blue-300 h-1/3 rounded-t-sm"></div>
+                                    <div class="w-1/4 bg-blue-300 h-2/3 rounded-t-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logos -->
+                <div class="mt-16">
+                    <p class="text-sm text-gray-500 mb-4">Con el respaldo de:</p>
+                    <div class="flex justify-center items-center gap-6 md:gap-8 flex-wrap">
+                        <img src="https://placehold.co/100x40/ffffff/333333?text=EPMAPS" alt="Logo EPMAPS" class="h-8 md:h-10 opacity-70">
+                        <img src="https://placehold.co/100x40/ffffff/333333?text=INAMHI" alt="Logo INAMHI" class="h-8 md:h-10 opacity-70">
+                        <img src="https://placehold.co/100x40/ffffff/333333?text=SENAGUA" alt="Logo SENAGUA" class="h-8 md:h-10 opacity-70">
+                        <img src="https://placehold.co/100x40/ffffff/333333?text=MAE" alt="Logo MAE" class="h-8 md:h-10 opacity-70">
+                        <img src="https://placehold.co/100x40/ffffff/333333?text=SNGRE" alt="Logo SNGRE" class="h-8 md:h-10 opacity-70">
+                    </div>
+                </div>
+                 <div class="text-center mt-12">
+                    <a href="#slide1" class="inline-block">
+                         <svg class="w-6 h-6 mx-auto text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        <span class="text-sm text-cyan-600">Volver al inicio</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
-            const dots = document.querySelectorAll('.dot');
-            function goToSlide(index) {
-                currentIndex = (index + totalSlides) % totalSlides;
-                sliderWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
-                dots.forEach(d => d.classList.remove('active'));
-                dots[currentIndex].classList.add('active');
-            }
-            prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
-            nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
-            goToSlide(0);
-        }
-        
-        // --- Lógica de Animación al Scroll ---
-        const revealElements = document.querySelectorAll('.reveal');
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-        revealElements.forEach(el => scrollObserver.observe(el));
+        });
     </script>
 
 </body>
